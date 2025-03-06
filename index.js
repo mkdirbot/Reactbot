@@ -1,8 +1,20 @@
-require("dotenv").config();
-const connectDB = require("./src/database");
-const bot = require("./src/bot");
-const server = require("./src/server");
+const express = require('express');
+const bodyParser = require('body-parser');
+const { Telegraf } = require('telegraf');
 
-connectDB();
-bot;
-server;
+const bot = new Telegraf(process.env.BOT_TOKEN);
+const app = express();
+
+app.use(bodyParser.json());
+
+// Webhook route
+app.post('/webhook', (req, res) => {
+    bot.handleUpdate(req.body);
+    res.sendStatus(200);
+});
+
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Bot is running on port ${PORT}`);
+});
